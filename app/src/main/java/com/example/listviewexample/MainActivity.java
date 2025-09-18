@@ -3,15 +3,42 @@ package com.example.listviewexample;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import module.Pet;
 
 public class MainActivity extends AppCompatActivity {
     ListView petListWidget;
     ArrayList<Pet> pets;
+
+    AdapterView.OnItemClickListener selectedListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Pet selected = (Pet) adapterView.getItemAtPosition(i);
+            Toast.makeText(getApplicationContext(), "hi hi" + selected.getName(), Toast.LENGTH_LONG).show();
+        }
+
+
+    };
+
+    AdapterView.OnItemClickListener selection3Listener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            HashMap<String, String> selected = (HashMap<String, String>) adapterView.getItemAtPosition(i);
+            Toast.makeText(getApplicationContext(), "hi hi " + selected.get("name"), Toast.LENGTH_LONG).show();
+        }
+
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +52,9 @@ public class MainActivity extends AppCompatActivity {
         pets.add(new Pet("Jack", "corgi", 10));
 
         petListWidget = findViewById(R.id.listViewWidget);
-        int selection = 2;
+        int selection = 3;
         populateListView(selection);
+
     }
 
     private void populateListView(int selection) {
@@ -36,8 +64,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 usingDataArray();
+                petListWidget.setOnItemClickListener(selectedListener);
                 break;
-
+            case 3:
+                usingTwoLines();
+                petListWidget.setOnItemClickListener(selection3Listener);
+                break;
         }
     }
 
@@ -59,6 +91,27 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<Pet> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, pets);
         petListWidget.setAdapter(adapter);
 
+
+    }
+
+    private void usingTwoLines() {
+        List<HashMap<String, String>> data = new ArrayList<>();
+
+        for(Pet p: pets) {
+            HashMap<String, String> current = new HashMap<>();
+            current.put("name", p.getName());
+            current.put("breed", p.getBreed());
+            data.add(current);
+        }
+
+        SimpleAdapter adapter = new SimpleAdapter(
+                this,
+                data,
+                android.R.layout.simple_list_item_2,
+                new String[]{"name","breed"},
+                new int[]{android.R.id.text1, android.R.id.text2}
+        );
+        petListWidget.setAdapter(adapter);
 
     }
 }
